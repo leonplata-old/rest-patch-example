@@ -1,0 +1,77 @@
+---
+swagger: '2.0'
+info:
+  version: 0.0.0
+  title: PATCH DEMO
+basePath: /api
+paths:
+  /users:
+    x-swagger-router-controller: users
+    get:
+      operationId: getAll
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/User"
+  /users/{GUID}:
+    x-swagger-router-controller: users
+    patch:
+      operationId: patch
+      summary: Update a user
+      parameters:
+        - name: GUID
+          in: path
+          required: true
+          type: string
+          format: GUID
+          description: The GUID of a specific user 
+        - name: JsonPatch
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/PatchRequest"
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: "#/definitions/User"
+definitions:
+  PatchRequest:
+    type: array
+    items:
+      $ref: "#/definitions/PatchDocument"
+  PatchDocument: 
+    description: A JSONPatch document as defined by RFC 6902 
+    required:
+     - "op"
+     - "path"
+    properties: 
+     op: 
+      type: string 
+      description: The operation to be performed 
+      enum:
+       - "add"
+       - "remove"
+       - "replace"
+       - "move"
+       - "copy"
+       - "test"
+     path: 
+      type: string 
+      description: A JSON-Pointer 
+     value: 
+      type: object 
+      description: The value to be used within the operations.
+     from: 
+      type: string 
+      description: A string containing a JSON Pointer value.
+  User:
+    type: object
+    properties:
+      name:
+        type: string
+      age:
+        type: number
