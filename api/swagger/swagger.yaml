@@ -1,34 +1,69 @@
 ---
 swagger: '2.0'
 info:
-  version: 0.0.0
-  title: PATCH DEMO
+  version: 1.0.0
+  title: Inventory
 basePath: /api
 paths:
-  /users:
-    x-swagger-router-controller: users
+  /spells:
+    x-swagger-router-controller: spells-controller
     get:
-      operationId: getAll
+      tags:
+        - spell
+      operationId: all
+      summary: Get all spells
       responses:
         200:
           description: OK
           schema:
             type: array
             items:
-              $ref: "#/definitions/User"
-  /users/{GUID}:
-    x-swagger-router-controller: users
-    patch:
-      operationId: patch
-      summary: Update a user
+              $ref: "#/definitions/Spell"
+    post:
+      tags:
+        - spell
+      operationId: insert
+      summary: Insert a new spell
       parameters:
-        - name: GUID
+        - name: body
+          in: body
+          required: true
+          schema:
+            $ref: "#/definitions/Spell"
+      responses:
+        200:
+          description: OK
+
+  /spells/{id}:
+    x-swagger-router-controller: spells-controller
+    get:
+      tags:
+        - spell
+      operationId: one
+      summary: Get a spell by id
+      parameters:
+        - name: id
           in: path
           required: true
           type: string
-          format: GUID
-          description: The GUID of a specific user 
-        - name: JsonPatch
+          description: The id of a specific spell
+      responses:
+        '200':
+          description: Successful response
+          schema:
+            $ref: "#/definitions/Spell"
+    patch:
+      tags:
+        - spell
+      operationId: modify
+      summary: Update a spell
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: string
+          description: The id of a specific spell
+        - name: body
           in: body
           required: true
           schema:
@@ -37,7 +72,7 @@ paths:
         '200':
           description: Successful response
           schema:
-            $ref: "#/definitions/User"
+            $ref: "#/definitions/Spell"
 definitions:
   PatchRequest:
     type: array
@@ -46,19 +81,19 @@ definitions:
   PatchDocument: 
     description: A JSONPatch document as defined by RFC 6902 
     required:
-     - "op"
-     - "path"
+     - op
+     - path
     properties: 
      op: 
       type: string 
       description: The operation to be performed 
       enum:
-       - "add"
-       - "remove"
-       - "replace"
-       - "move"
-       - "copy"
-       - "test"
+       - add
+       - remove
+       - replace
+       - move
+       - copy
+       - test
      path: 
       type: string 
       description: A JSON-Pointer 
@@ -68,10 +103,13 @@ definitions:
      from: 
       type: string 
       description: A string containing a JSON Pointer value.
-  User:
+  Spell:
     type: object
     properties:
       name:
         type: string
-      age:
+      points:
         type: number
+    required:
+      - name
+      - points

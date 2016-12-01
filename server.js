@@ -1,19 +1,13 @@
-
-const fs = require('fs');
-const path = require('path');
-const yaml = require('js-yaml');
-const promisify = require('./utils/promisify');
 const express = require('express');
-const swagger = require('swagger-tools');
+const swaggerSetup = require('./services/swagger-setup');
+const mongodbSetup = require('./services/mongodb-setup');
 
-const swaggerObject = yaml.safeLoad(fs.readFileSync(path.join(__dirname, './api/swagger/swagger.yaml'), 'utf8'));
+const PORT = 3002;
 const app = express();
-const PORT = 3000;
 
-swagger.initializeMiddleware(swaggerObject, function (middleware) {
-    app.use(middleware.swaggerMetadata());
-    app.use(middleware.swaggerValidator({ validateResponse: true }));
-    app.use('/api', middleware.swaggerRouter({ useStubs: true, controllers: './controllers' }));
-    app.use(middleware.swaggerUi());
-    app.listen(PORT, () => console.log(`Listening at port ${PORT}`));
-});
+Promise.resolve()
+    .then(() => mongodbSetup())
+    .then(() => swaggerSetup(app))
+    .then(() => app.listen(PORT))
+    .then(() => console.log(`Listening at port ${PORT}`))
+    .catch(err => console.log(err));
